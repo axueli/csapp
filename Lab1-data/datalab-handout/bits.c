@@ -323,7 +323,51 @@ unsigned float_twice(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_i2f(int x) {
-  return 2;
+   unsigned ux, mask, temp, e, sign = 0;
+        int E = 0, count;
+
+        if(!x) return 0; //0就直接返回
+
+        //将有符号数转化为无符号数
+        if(x&0x80000000){
+                ux = ~x+1;
+                sign = 0x80000000;
+        }
+        else ux=x;
+
+        //统计有几位
+        temp = ux;
+        while(temp){
+                E += 1;
+                temp = temp>>1;
+        }
+        ux = ux&(~(1<<(E-1))); //去掉最高位
+        e = E+126; //计算e的值
+        //对尾数进行移位
+        if(E<=24){
+                ux = ux<<(24-E); //尾数位数小于23的，直接将其移到顶
+        }else{//尾数位数大于23的，要进行截断，需要考虑舍入问题
+                count = 0;
+                while(E>25){
+                        if(ux&0x01) count+=1;
+                        ux = ux>>1;
+                        E -= 1;
+                }
+                mask = ux&0x01;
+                ux = ux>>1;
+                if(mask){
+                        if(count) ux+=1;
+                        else{
+                                if(ux&0x01) ux+=1;
+                        }
+                }
+                if(ux>>23){//进位造成多一位
+                        e+=1;
+                        ux = ux&0x7FFFFF;//(~(1<<23)); //去掉最高位
+                }
+        }
+
+        return sign+(e<<23)+ux;
 }
 /* 
  * float_f2i - Return bit-level equivalent of expression (int) f
@@ -338,5 +382,23 @@ unsigned float_i2f(int x) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-  return 2;
+  // 符号位
+  int sign = uf >> 31;
+  // 阶码位
+  int exp = ((uf >> 23) & 0xff) - 127;
+  // 小数位
+  int frac = (uf & 0x007fffff) | 0x00800000;
+  int value = 0;
+  if (exp < 0) {
+    return 0;
+  }
+  if (exp > 31) {
+    return 0x80000000;
+  }
+  if (exp < 23) {
+    value = frac >> (23 - exp);
+  } else if (exp > 23) {
+    value = frac << (exp - 23);
+  }
+  return sign ? ~value + 1 : value;
 }
