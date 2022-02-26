@@ -1,0 +1,13 @@
+Border relations with Canada have never been better.
+1 2 4 8 16 32
+0       400f7c <+57>: mov $0xcf,%eax    207
+1       400fb9 <+118>: mov $0x137,%eax  311
+2       400f83 <+64>: mov $0x2c3,%eax   707
+3       400f8a <+71>: mov $0x100,%eax   256
+4       400f91 <+78>: mov $0x185,%eax   389
+5       400f98 <+85>: mov $0xce,%eax    206
+6       400f9f <+92>: mov $0x2aa,%eax   682
+7       400fa6 <+99>: mov $0x147,%eax   327
+7 0
+IONEFG
+4 3 2 1 6 5
