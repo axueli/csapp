@@ -1,0 +1,49 @@
+                            | #copy.ys,written by peanwang
+0x000:                      | 	.pos 0
+0x000: 30f40002000000000000 | 	irmovq stack,%rsp
+0x00a: 804800000000000000   | 	call main
+0x013: 00                   | 	halt
+                            | 
+                            | #two block
+0x018:                      | 	.align 8
+                            | # Source block
+0x018:                      | src:
+0x018: 0a00000000000000     | 	.quad 0x00a
+0x020: b000000000000000     | 	.quad 0x0b0
+0x028: 000c000000000000     | 	.quad 0xc00
+                            | # Destination block
+0x030:                      | dest:
+0x030: 1101000000000000     | 	.quad 0x111
+0x038: 2202000000000000     | 	.quad 0x222
+0x040: 3303000000000000     | 	.quad 0x333
+                            | 
+0x048:                      | main:
+0x048: 30f71800000000000000 | 	irmovq src,%rdi
+0x052: 30f63000000000000000 | 	irmovq dest,%rsi
+0x05c: 30f20300000000000000 | 	irmovq $3,%rdx
+0x066: 807000000000000000   | 	call copy_block
+0x06f: 90                   | 	ret
+                            | 
+                            | #long copy_block(long *src,long *dest,long len)
+0x070:                      | copy_block:
+0x070: 30fe0000000000000000 |   irmovq $0,%r14
+0x07a: 30fd0100000000000000 |   irmovq $1,%r13
+0x084: 30fc0800000000000000 |   irmovq $8,%r12
+0x08e: 30f00000000000000000 |   irmovq $0, %rax
+0x098:                      | L13:
+0x098: 61e2                 |   subq %r14,%rdx
+0x09a: 71c800000000000000   |   jle L15
+0x0a3: 50170000000000000000 |   mrmovq (%rdi), %rcx
+0x0ad: 40160000000000000000 |   rmmovq %rcx, (%rsi)
+0x0b7: 6310                 |   xorq %rcx, %rax
+0x0b9: 61d2                 |   subq %r13, %rdx
+0x0bb: 60c6                 |   addq %r12,%rsi
+0x0bd: 60c7                 |   addq %r12,%rdi
+0x0bf: 709800000000000000   |   jmp L13
+0x0c8:                      | L15:
+0x0c8: 90                   |   ret
+                            | 
+                            | #stack starts here and grows to lower addresses
+0x200:                      | 	.pos 0x200
+0x200:                      | stack:
+                            | 
